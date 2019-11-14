@@ -16,15 +16,43 @@ exports.get = (req, res) => {
 }
 
 exports.getById = (req, res) => {
-  const id = req.params.id
+  const alunaId = req.params.id
+  
+  Alunas.findById(alunaId, function (err, aluna){
+    if (err) return res.status(500).send(err);
+
+    if(!aluna) {
+      return res.status(200).send({ message: `Infelizmente não localizamos a alunade id: ${alunaId}`});
+    }
+    res.status(200).send(aluna);
+  })
+  /*const id = req.params.id
   if (id > 34 || id <= 0) {
     res.redirect(301, "https://en.wikipedia.org/wiki/Man-in-the-middle_attack")
   }
-  res.status(200).send(alunas.find(aluna => aluna.id == id))
+  res.status(200).send(alunas.find(aluna => aluna.id == id))*/
 }
+
 
 exports.getBooks = (req, res) => {
   const id = req.params.id
+
+  Alunas.findById(id, function(err, aluna){
+
+    if(err) return res.status(500).send(err);
+
+    if(!aluna){
+      return res.status(200).send({ message: `Infelizmente não localizamos a alunade id: ${req.params.id}`});
+    }
+
+    const livrosAluna = aluna.livros
+    const livrosLidos = livrosAluna.filter(livro => livro.leu == "true")
+    const tituloLivros = livrosLidos.map(livro => livro.titulo)
+
+    res.status(200).send(tituloLivros);
+
+  })
+  /*const id = req.params.id
   const aluna = alunas.find(aluna => aluna.id == id)
   if (!aluna) {
     res.send("Nao encontrei essa garota")
@@ -32,7 +60,7 @@ exports.getBooks = (req, res) => {
   const livrosAluna = aluna.livros
   const livrosLidos = livrosAluna.filter(livro => livro.leu == "true")
   const tituloLivros = livrosLidos.map(livro => livro.titulo)
-  res.send(tituloLivros)
+  res.send(tituloLivros)*/
 }
 
 exports.getSp = (req, res) => {
