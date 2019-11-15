@@ -82,6 +82,28 @@ exports.getSp = (req, res) => {
   res.status(200).send(meninasSp)*/
 }
 
+//pegar do BD
+exports.getAge = (req, res) => {
+  const id = req.params.id
+  Alunas.findById(req.params.id, function (err, aluna) {
+  
+    if (err) return res.status(500).send(err)
+
+    if (!aluna) {
+      return res.status(200).send({ message: `Infelizmente não localizamos a aluna de id: ${req.params.id}` });
+    }
+
+    const dataNasc = aluna.dateOfBirth
+    const arrData = dataNasc.split("/")
+    const dia = arrData[0]
+    const mes = arrData[1]
+    const ano = arrData[2]
+    const idade = calcularIdade(ano, mes, dia)
+    res.status(200).send({ idade })
+
+  })
+}
+/* PEGA DA MODEL
 exports.getAge = (req, res) => {
   const id = req.params.id
   const aluna = alunas.find(item => item.id == id)
@@ -106,9 +128,17 @@ function calcularIdade(anoDeNasc, mesDeNasc, diaDeNasc) {
     idade -= 1
   }
   return idade
-}
+}*/
 
 exports.post = (req, res) => { 
+let aluna = new Alunas(req.body);
+
+aluna.save(function (err) {
+  if (err) res.status(500).send(err);
+
+    res.status(201).send(aluna);
+})
+/* PEGA DO JSON 
   const { nome, dateOfBirth, nasceuEmSp, id, livros } = req.body;
   alunas.push({ nome, dateOfBirth, nasceuEmSp, id, livros });
 
@@ -119,10 +149,29 @@ exports.post = (req, res) => {
     console.log("The file was saved!");
   }); 
 
-  return res.status(201).send(alunas);
+  return res.status(201).send(alunas);*/
 }
 
 exports.postBooks = (req, res) => {
+  const id = req.params.id
+
+  Alunas.findById(alunaId, function (err, aluna){
+    if (err) return res.status(500).send(err.message);
+
+    if(!aluna) {
+      return res.status(200).send({ message: `Infelizmente não localizei essa garota`})
+        }
+        const livro = req.body;
+        (aluna.livros).push(livro);
+
+        aluna.save(function (err) {
+          if (err) res.status(500).send(err);
+
+          res.status(201).send(aluna);
+        })
+  });
+
+  /* PUXANDO DO JSON
   const id = req.params.id
   const aluna = alunas.find(aluna => aluna.id == id)
   if (!aluna) {
@@ -138,5 +187,5 @@ exports.postBooks = (req, res) => {
     console.log("The file was saved!");
   });
 
-  res.status(201).send(alunas[aluna.id - 1].livros);
+  res.status(201).send(alunas[aluna.id - 1].livros);*/
 }
